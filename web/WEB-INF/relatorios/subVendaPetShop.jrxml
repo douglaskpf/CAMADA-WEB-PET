@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-06-22T16:51:19 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subVenda" pageWidth="585" pageHeight="842" whenNoDataType="BlankPage" columnWidth="585" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="04cf4dfb-30bc-4e76-a8f6-58b7c6843e7d">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="pet-shop.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="subzebra">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT} % 2 == 0)]]></conditionExpression>
+			<style backcolor="#F2DDDC"/>
+		</conditionalStyle>
+	</style>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="produto" class="br.edu.ifsul.modelo.Produto">
+		<fieldDescription><![CDATA[produto]]></fieldDescription>
+	</field>
+	<field name="valorTotal" class="java.lang.Double">
+		<fieldDescription><![CDATA[valorTotal]]></fieldDescription>
+	</field>
+	<field name="quantidade" class="java.lang.Double">
+		<fieldDescription><![CDATA[quantidade]]></fieldDescription>
+	</field>
+	<field name="valorUnitario" class="java.lang.Double">
+		<fieldDescription><![CDATA[valorUnitario]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="551" height="16" backcolor="#99FFFF" uuid="3511db44-bab3-4b09-bbac-5a40a426aee7"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="1" width="100" height="15" uuid="cee32fc7-e732-45cd-be1a-a6e027a0468d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Produto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="1" width="100" height="15" uuid="1e6a02ce-26b7-4353-8f68-331400bb9100"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Quantidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="298" y="1" width="100" height="15" uuid="cf7973a6-76d2-4a6a-83a0-e1fd552f9628"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Valor Unitário]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="1" width="121" height="15" uuid="0b2ecc12-6bf2-4bf8-8b26-bd8cc53630cd"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<rectangle>
+				<reportElement style="subzebra" x="0" y="0" width="551" height="16" uuid="815ff6cd-2ad0-4468-befc-a84ca8d59667"/>
+			</rectangle>
+			<textField>
+				<reportElement x="9" y="0" width="181" height="15" uuid="d0ef7e21-576f-4acb-ada3-aa3d911f0a56"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{produto}.getNome()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="195" y="1" width="100" height="15" uuid="c331f598-9a0c-47da-a4d0-5eb29a8c83a5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
+			</textField>
+			<textField pattern="R$ 0.00">
+				<reportElement x="298" y="0" width="130" height="15" uuid="b22fa7fe-1f27-43f6-9877-5acaa6598d25"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{valorUnitario}]]></textFieldExpression>
+			</textField>
+			<textField pattern="R$ 0.00">
+				<reportElement x="425" y="1" width="124" height="15" uuid="23af4f0d-82f9-47ae-b694-2b5459b1ad5d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{valorTotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

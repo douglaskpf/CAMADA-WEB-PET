@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <f:view encoding="ISO-8859-1" contentType="text/html">
+        <h:head>
+            <title><ui:insert name="titulo">titulo</ui:insert></title>
+            <h:outputStylesheet library="css" name="estilos.css"/>
+            <h:outputScript library="js" name="scripts.js"/>
+        </h:head>
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" header="Sistema Pet Shop" style="text-align: center">
+
+            </p:layoutUnit>
+            <p:layoutUnit position="west" header="Menu"
+                          resizable="true" closable="true"
+                          collapsible="true" size="170">
+                <h:form id="menu" prependId="false">
+                    <p:menu>
+                        <p:submenu label="Cadastros" rendered="#{controleLogin.usuarioLogado != null}">
+
+                            <p:menuitem value="Clientes"
+                                        action="#{controleCliente.listar()}"
+                                        ajax="false"/>
+                              
+                            <p:menuitem value="Animais"
+                                        action="#{controleAnimal.listar()}"
+                                        ajax="false"/>  
+                                                    
+                            <p:menuitem value="Produtos"
+                                        action="#{controleProduto.listar()}"
+                                        ajax="false"/>    
+
+                            <p:menuitem value="Servicos"
+                                        action="#{controleServico.listar()}"
+                                        ajax="false"/>    
+                            
+                               <p:menuitem value="Vendas"
+                                        action="#{controleVenda.listar()}"
+                                        ajax="false"/>    
+
+                           
+                        </p:submenu>
+                        
+                        <p:submenu label="Usuario:#{controleLogin.usuarioLogado.nome}" rendered="#{controleLogin.usuarioLogado != null}">
+                            <p:menuitem value="Logout" ajax="false"
+                                        action="#{controleLogin.efetuarLogout()}"/>
+                        </p:submenu>
+                        
+                                            
+                        <p:submenu label="Login" rendered="#{controleLogin.usuarioLogado == null}">
+                            <p:menuitem value="Login" ajax="false"
+                                        action="#{controleLogin.paginaLogin()}"/>
+
+                        </p:submenu>
+
+
+                    </p:menu>
+                </h:form>              
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <ui:insert name="conteudo">
+
+                </ui:insert>
+            </p:layoutUnit>
+            <ui:insert name="dialogos">
+
+            </ui:insert>
+            <p:layoutUnit position="south">
+                <ui:include src="/templates/ajaxstatus.xhtml"/>
+                <div align="center">Direitos Reservados</div>
+            </p:layoutUnit>
+        </p:layout>
+    </f:view>
+</html>
+

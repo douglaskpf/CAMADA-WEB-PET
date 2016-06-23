@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">Manutenção de Vendas</ui:define>
+        <ui:define name="conteudo">
+            <h:form id="formListagem" prependId="false">
+                <p:growl id="growl"/>
+                <p:commandButton value="Produtos Disponíveis"
+                                 action="#{controleVenda.imprimeProdutos()}"                
+                                 onclick="this.form.target='_blank'" ajax="false"/>
+                <p:commandButton actionListener="#{controleVenda.novo()}"
+                                 value="Nova Venda" icon="ui-icon-plus"
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                <div align="center">
+                    <p:panelGrid columns="11">
+                        <p:outputLabel value="Ordem:"/>
+                        <p:selectOneMenu value="#{controleVenda.dao.ordem}">
+                            <f:selectItem itemLabel="ID" itemValue="id"/>                            
+                            <f:selectItem itemLabel="Pessoa" itemValue="pessoa.nome"/>
+                            <p:ajax update="listagem"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="Filtro: "/>
+                        <p:inputText value="#{controleVenda.dao.filtro}">
+                            <p:ajax event="keyup" update="listagem"/>
+                        </p:inputText>
+                        <p:commandButton value="Filtrar" update="listagem"/>
+                        <p:outputLabel value="Máximo de objetos"/>
+                        <p:inputText value="#{controleVenda.dao.maximoObjetos}" size="5">
+                            <p:ajax event="keyup" update="listagem"/>
+                        </p:inputText>
+                        <p:commandButton action="#{controleVenda.dao.primeiro()}"
+                                         value="Primeiro" update="listagem"/>
+                        <p:commandButton action="#{controleVenda.dao.anterior()}"
+                                         value="Anterior" update="listagem"/>
+                        <p:commandButton action="#{controleVenda.dao.proximo()}"
+                                         value="Próximo" update="listagem"/>
+                        <p:commandButton action="#{controleVenda.dao.ultimo()}"
+                                         value="Ultimo" update="listagem"/>
+                    </p:panelGrid>
+                </div>
+                <p:dataTable value="#{controleVenda.dao.listaObjetos}" var="obj"
+                             id="listagem">
+                    <f:facet name="header">
+                        <p:outputLabel value="Lista de Vendas"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <p:outputLabel value="#{controleVenda.dao.mensagemNavegacao}"/>
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Pessoa">
+                        <p:outputLabel value="#{obj.cliente.nome}"/>
+                    </p:column>                    
+                    <p:column headerText="Data">
+                        <p:outputLabel value="#{obj.data.time}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                        </p:outputLabel>
+                    </p:column>                    
+                    <p:column headerText="Valor Total">
+                        <p:outputLabel value="#{obj.valorTotal}">
+                            <f:convertNumber pattern="R$ 0.00"/>
+                        </p:outputLabel>
+                    </p:column>   
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton
+                                actionListener="#{controleVenda.editar(obj.id)}"
+                                icon="ui-icon-pencil"
+                                update=":formEdicao"
+                                process="@form"
+                                oncomplete="PF('dlg').show();"
+                                id="btnAlterar"/>
+                            <p:commandButton
+                                actionListener="#{controleVenda.remover(obj.id)}"
+                                icon="ui-icon-trash"
+                                update="@form"
+                                process="@form"
+                                id="btnExcluir"
+                                onclick="if (!confirm('Confirma a exclusão do objeto'))
+                                            return false"/>
+                            <p:commandButton value="Imprimir"
+                                             action="#{controleVenda.imprimeVenda(obj.id)}"                
+                                 onclick="this.form.target='_blank'" ajax="false"/>                            
+                        </div>
+                    </p:column>                    
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlg" header="Edição" resizable="false" modal="true"
+                      width="700" height="450">
+                <h:form id="formEdicao" prependId="false">
+                    <p:growl/>
+                    <p:tabView id="tab">
+                        <p:tab title="Dados Principais">
+                            <div align="center">
+                                <p:panelGrid columns="2">
+                                    <f:facet name="footer">
+                                        <div align="center">
+                                            <p:commandButton value="Salvar"
+                                                             icon="ui-icon-disk"
+                                                             actionListener="#{controleVenda.salvar()}"
+                                                             update=":formEdicao :formListagem"
+                                                             oncomplete="if(!args.validationFailed){PF('dlg').hide();}"/>
+                                        </div>
+                                    </f:facet>
+                                    <p:outputLabel value="ID"/>
+                                    <p:inputText value="#{controleVenda.objeto.id}" readonly="true"
+                                                 size="10"/>
+                                    <p:outputLabel value="Data" for="txtData"/>
+                                    <p:calendar id="txtData" value="#{controleVenda.objeto.data}"
+                                                pattern="dd/MM/yyyy" mask="true" locale="pt_BR"
+                                                navigator="true">
+                                        <f:converter converterId="converterCalendar"/>
+                                    </p:calendar>
+                                    <p:outputLabel value="Pessoa" for="selectPessoa"/>
+                                    <p:selectOneMenu id="selectPessoa"
+                                                     value="#{controleVenda.objeto.cliente}">
+                                        <f:converter converterId="converterCliente"/>
+                                        <f:selectItem itemLabel="Selecione um registro"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems value="#{controleVenda.daoCliente.listaTodos}"
+                                                       var="c" itemLabel="#{c.nome}"/>
+                                    </p:selectOneMenu>
+                                    <p:outputLabel value="Valor Total" for="txtValorTotal"/>
+                                    <p:inputText value="#{controleVenda.objeto.valorTotal}"
+                                                 id="txtValorTotal"
+                                                 size="12" maxlength="12"/>
+                                  
+                                    <p:outputLabel value="Tipo Pagamento" for="selectPagamento"/>
+                                    <p:selectOneMenu value="#{controleVenda.objeto.pagamento}"
+                                                     id="selectPagamento">
+                                        <f:selectItem itemValue="A vista" itemLabel="A vista"/>
+                                        <f:selectItem itemValue="A prazo" itemLabel="A prazo"/>
+                                    </p:selectOneMenu> 
+                                    <p:outputLabel value="Usuário" for="selectUsuario"/>
+                                    <p:selectOneMenu id="selectUsuario"
+                                                     value="#{controleVenda.objeto.usuario}">
+                                        <f:converter converterId="converterUsuario"/>
+                                        <f:selectItem itemLabel="Selecione um registro"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems value="#{controleVenda.daoUsuario.listaTodos}"
+                                                       var="u" itemLabel="#{u.nome}"/>
+                                    </p:selectOneMenu>                                    
+                                </p:panelGrid>
+                            </div>
+                        </p:tab>
+                        <p:tab title="Itens da venda">
+                            <p:dataTable value="#{controleVenda.objeto.itens}"
+                                         var="item" rowIndexVar="idx" id="listaItens">
+                                <f:facet name="header">
+                                    <p:commandButton value="Novo item"
+                                                     actionListener="#{controleVenda.novoItem()}"
+                                                     update=":formItem" icon="ui-icon-plus"
+                                                     id="btnNovoItem"
+                                                     process="btnNovoItem"
+                                                     oncomplete="PF('dlgItem').show();"/>
+                                </f:facet>
+                                <p:column headerText="ID">
+                                    <p:outputLabel value="#{item.id}"/>
+                                </p:column>
+                                <p:column headerText="Produto">
+                                    <p:outputLabel value="#{item.produto.nome}"/>
+                                </p:column>   
+                                
+                                 <p:column headerText="Servico">
+                                    <p:outputLabel value="#{item.servico.nome}"/>
+                                </p:column>  
+                                
+                                <p:column headerText="Quantidade">
+                                    <p:outputLabel value="#{item.quantidade}"/>
+                                </p:column>                                
+                                <p:column headerText="Valor Unitario">
+                                    <p:outputLabel value="#{item.valorUnitario}"/>
+                                </p:column>                                
+                                <p:column headerText="Valor Total">
+                                    <p:outputLabel value="#{item.valorTotal}"/>
+                                </p:column>                                
+                                <p:column headerText="Ações">
+                                    <div align="center">
+                                        <p:commandButton id="btnAlterarItem" icon="ui-icon-plus"
+                                                         actionListener="#{controleVenda.alterarItem(idx)}"
+                                                         update=":formItem" process="btnAlterarItem"
+                                                         oncomplete="PF('dlgItem').show();"/>
+                                        <p:commandButton id="btnRemoverItem" icon="ui-icon-trash"
+                                                         actionListener="#{controleVenda.removerItem(idx)}"
+                                                         process="btnRemoverItem"
+                                                         update="listaItens :formListagem:growl 
+                                                         :formEdicao:tab:txtValorTotal"
+                                                         onclick="if (!confirm('Confirma a exclusão do objeto?'))
+                                                                     return false"/>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                       
+                    </p:tabView>
+                </h:form>
+                <ui:include src="/templates/ajaxstatus.xhtml"/>
+            </p:dialog>
+            <p:dialog header="Edição de Item da Venda"
+                      widgetVar="dlgItem" resizable="false" modal="true"
+                      width="400">
+                <h:form id="formItem">
+                    <p:growl/>
+                    <div align="center">
+                        <p:panelGrid columns="2">
+                            <f:facet name="footer">
+                                <div align="center">
+                                    <p:commandButton id="btnAdicionarItem"
+                                                     value="Salvar"
+                                                     icon="ui-icon-plus"
+                                                     actionListener="#{controleVenda.salvarItem()}"
+                                                     update=":formEdicao:tab:listaItens :formItem
+                                                     :formEdicao:tab:txtValorTotal"
+                                                     process="@form"
+                                                     oncomplete="if(!args.validationFailed){PF('dlgItem').hide();}"/> 
+                                </div>
+                            </f:facet>
+                            <p:outputLabel value="ID"/>
+                            <p:inputText value="#{controleVenda.item.id}" readonly="true" size="10"/>
+                            <p:outputLabel value="Produto" for="selectProduto"/>
+                            <p:selectOneMenu value="#{controleVenda.item.produto}" id="selectProduto">
+                                <f:converter converterId="converterProduto"/>
+                                <f:selectItem itemLabel="Selecione um registro" noSelectionOption="true"/>
+                                <f:selectItems value="#{controleVenda.daoProduto.listaTodos}"
+                                               var="p" itemLabel="#{p.nome}"/>
+                                <p:ajax listener="#{controleVenda.atualizaValorUnitarioItem()}"
+                                        update="txtValorUnitario"/>
+                            </p:selectOneMenu>
+                           
+                                                        
+                            <p:outputLabel value="Quantidade" for="txtQuantidade"/>
+                            <p:inputText value="#{controleVenda.item.quantidade}" id="txtQuantidade"
+                                         maxlength="12" size="12">
+                                <p:ajax update="txtValorTotal" listener="#{controleVenda.calculaValorTotalItem()}"
+                                        event="blur"/>
+                            </p:inputText>
+                            <p:outputLabel value="Valor Unitario" for="txtValorUnitario"/>
+                            <p:inputText value="#{controleVenda.item.valorUnitario}"
+                                         id="txtValorUnitario" maxlength="12" size="12"/>
+                            <p:outputLabel value="Valor Total" for="txtValorTotal"/>
+                            <p:inputText value="#{controleVenda.item.valorTotal}"
+                                         id="txtValorTotal" maxlength="12" size="12"/>                                                
+                        </p:panelGrid> 
+                    </div>
+                </h:form>         
+                <ui:include src="/templates/ajaxstatus.xhtml"/>
+            </p:dialog>
+        </ui:define>         
+    </ui:composition>
+</html>

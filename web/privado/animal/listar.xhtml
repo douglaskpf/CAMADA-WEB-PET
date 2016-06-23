@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">Manutenção de Animais</ui:define>
+        <ui:define name="conteudo">
+            <h:form id="formListagem" >
+                <p:messages/>
+                <p:growl id="growl"/>
+                <p:commandButton value="Novo" actionListener="#{controleAnimal.novo()}" icon="ui-icon-document"
+                                 oncomplete="PF('dlg').show();" update=":formEdicao"/>
+                <div align="center">
+                    <p:panelGrid columns="11">
+                        <p:outputLabel value="Ordem:"/>
+                        <p:selectOneMenu value="#{controleAnimal.dao.ordem}">
+                            <f:selectItem itemLabel="ID" itemValue="id"/>
+                            <f:selectItem itemLabel="Nome" itemValue="nome"/>
+                                 <f:selectItem itemLabel="Espécie" itemValue="especie"/>
+                                      <f:selectItem itemLabel="Raça" itemValue="raca"/>
+                                               <f:selectItem itemLabel="Pelagem" itemValue="pelagem"/>
+                            <f:selectItem itemLabel="Cliente" itemValue="cliente.nome"/>
+                            <p:ajax update="listagem"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="Filtro:"/>
+                        <p:inputText value="#{controleAnimal.dao.filtro}">
+                            <p:ajax event="blur" update="listagem growl"/>
+                        </p:inputText>
+                        <p:commandButton value="Filtrar" update="listagem growl"
+                                         icon="ui-icon-search"/>
+                        <p:outputLabel value="Máximo de objetos:"/>
+                        <p:inputText value="#{controleAnimal.dao.maximoObjetos}" size="3">
+                            <p:ajax event="keyup" update="listagem"/>
+                        </p:inputText>
+                        <p:commandButton value="Primeiro" actionListener="#{controleAnimal.dao.primeiro()}"
+                                         update="listagem" icon="ui-icon-seek-first"/>
+                        <p:commandButton value="Anterior" actionListener="#{controleAnimal.dao.anterior()}"
+                                         update="listagem" icon="ui-icon-seek-prev"/>                        
+                        <p:commandButton value="Proximo" actionListener="#{controleAnimal.dao.proximo()}"
+                                         update="listagem" icon="ui-icon-seek-next"/>                        
+                        <p:commandButton value="Ultimo" actionListener="#{controleAnimal.dao.ultimo()}"
+                                         update="listagem" icon="ui-icon-seek-end"/>                        
+                    </p:panelGrid>
+                </div>
+                <p:dataTable value="#{controleAnimal.dao.listaObjetos}" var="obj"
+                             id="listagem">
+                    <f:facet name="header">
+                        <p:outputLabel value="Lista de Animais"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <div align="center">
+                            <p:outputLabel value="#{controleAnimal.dao.mensagemNavegacao}"/>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome">                        
+                        <p:outputLabel value="#{obj.nome}"/>
+                    </p:column>  
+                     <p:column headerText="Espécie">                        
+                        <p:outputLabel value="#{obj.especie}"/>
+                    </p:column> 
+                    <p:column headerText="Raça">                        
+                        <p:outputLabel value="#{obj.raca}"/>
+                    </p:column> 
+                        <p:column headerText="Pelagem">                        
+                        <p:outputLabel value="#{obj.pelagem}"/>
+                    </p:column>
+                    
+                    <p:column headerText="Cliente">              
+                        <p:outputLabel value="#{obj.cliente.nome}"/>
+                    </p:column>
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton  icon="ui-icon-pencil" id="btnEditar"
+                                              actionListener="#{controleAnimal.editar(obj.id)}" 
+                                              oncomplete="PF('dlg').show();" update=":formEdicao"/>
+                            <p:commandButton   icon="ui-icon-trash" id="btnExcluir"
+                                               actionListener="#{controleAnimal.remover(obj.id)}"
+                                               onclick="if (!confirm('Confirma a exclusão'))
+                                                           return false" update="@form"
+                                               process="@form"/>       
+                            <p:tooltip for="btnEditar" value="Editar"/>
+                            <p:tooltip for="btnExcluir" value="Excluir"/>
+                        </div>
+                    </p:column>                   
+                </p:dataTable>
+            </h:form>            
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog widgetVar="dlg" header="Edição" modal="true" resizable="false">
+                <h:form id="formEdicao">
+                    <p:growl/>
+                    <div align="center">
+                        <p:panelGrid columns="2">
+                            <f:facet name="footer">
+                                <div align="center">
+                                    <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                                     actionListener="#{controleAnimal.salvar()}"
+                                                     oncomplete="if(!args.validationFailed){PF('dlg').hide();}"
+                                                     update=":formEdicao :formListagem"/>
+                                </div>
+                            </f:facet>
+                            <p:outputLabel value="ID"/>
+                            <p:inputText value="#{controleAnimal.objeto.id}"/>
+                                                       
+                            <p:outputLabel value="Nome" for="txtNome"/>
+                            <p:inputText id="txtNome"
+                                         value="#{controleAnimal.objeto.nome}"
+                                         size="40" maxlength="20"
+                                         placeholder="Obrigatório"/>
+                            
+                                <p:outputLabel value="Espécie" for="txtEspecie"/>
+                            <p:inputText id="txtEspecie"
+                                         value="#{controleAnimal.objeto.especie}"
+                                         size="40" maxlength="20"
+                                         placeholder="Obrigatório"/>
+                            
+                             <p:outputLabel value="Raça" for="txtRaca"/>
+                            <p:inputText id="txtRaca"
+                                         value="#{controleAnimal.objeto.raca}"
+                                         size="40" maxlength="20"
+                                         placeholder="Obrigatório"/>
+                            
+                                 <p:outputLabel value="Pelagem" for="txtPelagem"/>
+                            <p:inputText id="txtPelagem"
+                                         value="#{controleAnimal.objeto.pelagem}"
+                                         size="40" maxlength="20"
+                                         placeholder="Obrigatório"/>
+                            
+                            
+                            <p:outputLabel value="Cliente" for="selectCliente"/>
+                            <p:selectOneMenu id="selectCliente"
+                                             value="#{controleAnimal.objeto.cliente}">
+                                <f:converter converterId="converterCliente"/>
+                                <f:selectItem itemLabel="Selecione um registro"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{controleAnimal.daoCliente.listaTodos}"
+                                               var="c" itemLabel="#{c.nome}"/>
+                            </p:selectOneMenu>
+                        </p:panelGrid>
+                    </div>
+                </h:form>
+                <ui:include src="/templates/ajaxstatus.xhtml"/>
+            </p:dialog>
+        </ui:define>
+    </ui:composition>    
+
+</html>
+
